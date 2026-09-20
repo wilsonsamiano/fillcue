@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1B365D">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="FillCue">
+  <title>FillCue — offline fuel log</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icons/icon.svg">
+  <link rel="stylesheet" href="./css/app.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark">FC</div>
+      <div>
+        <h1>FillCue</h1>
+        <p>On-device receipt + cluster reader</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="btn-new" type="button">+ Fill</button>
+    </div>
+  </header>
+  <main>
+    <section class="view active" data-view="home">
+      <div class="cluster">
+        <div class="cluster-top">
+          <span id="cluster-sub">Last fill</span>
+          <span id="epa-line">EPA</span>
+        </div>
+        <div class="cluster-range">
+          <div class="label">Range</div>
+          <div><span class="num" id="cluster-range">—</span> <span class="unit">MI</span></div>
+        </div>
+        <div class="cluster-grid">
+          <div class="pill"><span class="k">Odo</span><span class="v" id="cluster-odo">—</span></div>
+          <div class="pill"><span class="k">After reset</span><span class="v" id="cluster-mph">—</span></div>
+          <div class="pill"><span class="k">Outside</span><span class="v" id="cluster-temp">—</span></div>
+        </div>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="k">Fills</div><div class="v" id="kpi-fills">0</div></div>
+        <div class="kpi"><div class="k">Gallons</div><div class="v" id="kpi-gallons">—</div></div>
+        <div class="kpi"><div class="k">Spent</div><div class="v" id="kpi-spent">—</div></div>
+        <div class="kpi"><div class="k">Avg $/gal</div><div class="v" id="kpi-ppg">—</div></div>
+        <div class="kpi"><div class="k">Avg MPG</div><div class="v" id="kpi-mpg">—</div></div>
+        <div class="kpi"><div class="k">Est. range</div><div class="v" id="kpi-range">—</div></div>
+      </div>
+      <div class="card">
+        <h2>Capture</h2>
+        <p class="hint">Photos stay on this device.</p>
+        <div class="actions">
+          <label class="btn primary">Receipt photo<input id="file-receipt" type="file" accept="image/*" capture="environment"></label>
+          <label class="btn gold">Cluster photo<input id="file-cluster" type="file" accept="image/*" capture="environment"></label>
+          <label class="btn ghost full">Auto-detect<input id="file-auto" type="file" accept="image/*"></label>
+        </div>
+      </div>
+    </section>
+    <section class="view" data-view="capture">
+      <div class="card">
+        <h2>Review before save</h2>
+        <div class="thumbs">
+          <figure><img id="thumb-receipt" alt="Receipt" hidden><figcaption>Receipt</figcaption></figure>
+          <figure><img id="thumb-cluster" alt="Cluster" hidden><figcaption>Cluster</figcaption></figure>
+        </div>
+        <div class="progress"><span id="ocr-bar"></span></div>
+        <div class="status" id="ocr-status">Waiting for a photo.</div>
+      </div>
+      <div class="card">
+        <form class="grid" id="fill-form">
+          <input type="hidden" name="id">
+          <label>Date<input name="date" type="date" required></label>
+          <label>Time<input name="time" type="time"></label>
+          <label>Station<input name="station"></label>
+          <label>City / State<input name="city"></label>
+          <label>Pump<input name="pump" inputmode="numeric"></label>
+          <label>Grade<input name="grade"></label>
+          <label>Gallons<input name="gallons" inputmode="decimal"></label>
+          <label>Price / gal<input name="pricePerGal" inputmode="decimal"></label>
+          <label>Total $<input name="total" inputmode="decimal"></label>
+          <label>Odometer<input name="odometer" inputmode="numeric"></label>
+          <label>Cluster range<input name="clusterRange" inputmode="numeric"></label>
+          <label>After reset mph<input name="clusterAvgMph" inputmode="numeric"></label>
+          <label>Outside F<input name="outsideF" inputmode="numeric"></label>
+          <label>Fill to full?<select name="fillToFull"><option>Yes</option><option>Partial</option><option>No</option></select></label>
+          <label>Trip type<select name="tripType"><option>Mixed</option><option>City</option><option>Highway</option><option>Towing</option><option>Loaded family</option></select></label>
+          <label class="span2">Notes<textarea name="notes"></textarea></label>
+        </form>
+        <div class="actions">
+          <button class="btn primary" id="btn-save" type="button">Save fill</button>
+          <button class="btn ghost" id="btn-clear" type="button">Reset form</button>
+          <button class="btn danger full" id="btn-delete" type="button">Delete this fill</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Raw OCR</h2>
+        <div class="ocr-box" id="ocr-receipt"></div>
+        <div class="ocr-box" id="ocr-cluster"></div>
+      </div>
+    </section>
+    <section class="view" data-view="log">
+      <div class="card"><h2>Fill log</h2><div id="log-list"></div></div>
+    </section>
+    <section class="view" data-view="settings">
+      <div class="card">
+        <h2>Vehicle</h2>
+        <form class="grid" id="settings-form">
+          <label class="span2">Name<input name="vehicle" required></label>
+          <label>Tank (gal)<input name="tankGal" type="number" step="0.1"></label>
+          <label>Usable tank<input name="usableGal" type="number" step="0.1"></label>
+          <label>EPA city<input name="epaCity" type="number"></label>
+          <label>EPA hwy<input name="epaHwy" type="number"></label>
+          <label>EPA combined<input name="epaComb" type="number"></label>
+          <button class="btn primary full" type="submit">Save vehicle</button>
+        </form>
+        <p class="ok-banner banner" id="settings-saved" hidden>Saved on this device.</p>
+      </div>
+      <div class="card">
+        <h2>Backup</h2>
+        <div class="actions">
+          <button class="btn ghost" id="btn-export-json" type="button">Export JSON</button>
+          <button class="btn ghost" id="btn-export-csv" type="button">Export CSV</button>
+          <label class="btn gold full">Import JSON<input id="file-import" type="file" accept="application/json"></label>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Support</h2>
+        <p class="hint">FillCue is free. Coffee keeps the side projects going.</p>
+        <div class="actions">
+          <a class="btn gold full" href="https://buymeacoffee.com/wilsonsamiano" target="_blank" rel="noopener">Buy me a coffee</a>
+        </div>
+        <p class="hint">buymeacoffee.com/wilsonsamiano</p>
+      </div>
+    </section>
+  </main>
+  <nav class="tabbar">
+    <button class="active" data-view="home" type="button">Range<small>Home</small></button>
+    <button data-view="capture" type="button">Capture<small>Review</small></button>
+    <button data-view="log" type="button">Log<small>Fills</small></button>
+    <button data-view="settings" type="button">Setup<small>Vehicle</small></button>
+  </nav>
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
