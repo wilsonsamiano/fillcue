@@ -1,0 +1,20 @@
+{
+  "name": "FillCue",
+  "short_name": "FillCue",
+  "description": "Offline fuel log that reads pump receipts and instrument-cluster photos on-device.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0e141c",
+  "theme_color": "#1B365D",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
