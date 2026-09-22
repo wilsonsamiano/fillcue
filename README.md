@@ -2,7 +2,11 @@
 
 Offline-first fuel log. Point the phone at a pump receipt and the instrument cluster. Numbers are read **on the device**, reviewed, then stored in this browser. No account. No server. No photo upload.
 
-Built around a 2015 Toyota Highlander XLE log, but the vehicle sheet is just settings.
+**Current app is [GarageBook](https://github.com/wilsonsamiano/garagebook)** — multi-vehicle garage book with shop receipts, EV charging, VIN/EPA lookup, and a PWA.
+
+**[Open GarageBook](https://wilsonsamiano.github.io/garagebook/)**
+
+This repo is the original static FillCue PWA.
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/wilsonsamiano)
 
